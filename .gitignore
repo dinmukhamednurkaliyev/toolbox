@@ -1,0 +1,72 @@
+# General
+.*
+!.*/
+!.gitignore
+
+# Operating systems
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors and IDEs
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache
+.cache/
+.cache-loader/
+
+# Coverage
+coverage/
+*.cover
+*.coverage
+coverage.out
+
+# Build output
+build/
+dist/
+out/
+
+# Go
+*.test
+*.prof
+
+# Node.js
+node_modules/
+
+# Dart and Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Rust
+target/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Java and Gradle
+.gradle/
+
+# Local generated files
+generated/
