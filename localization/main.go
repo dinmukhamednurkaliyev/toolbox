@@ -17,12 +17,22 @@ func main() {
 		return
 	}
 
-	generatedCode, generateError := generateTypeScript(languages)
+	generatedCode, generateError := generateDart(languages)
 
 	if generateError != nil {
 		fmt.Println(generateError)
 		return
 	}
 
-	fmt.Println(generatedCode)
+	writeError := writeGeneratedFile(
+		"generated/localization.dart",
+		generatedCode,
+	)
+
+	if writeError != nil {
+		fmt.Println(writeError)
+		return
+	}
+
+	fmt.Println("generated localization.dart")
 }

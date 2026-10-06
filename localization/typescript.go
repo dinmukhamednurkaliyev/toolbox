@@ -1,21 +1,61 @@
 package main
 
 import (
+	"bytes"
+	_ "embed"
 	"encoding/json"
 	"sort"
 	"strings"
+	"text/template"
 )
 
+//go:embed templates/typescript.ts
+var typeScriptTemplate string
+
+type TypeScriptTemplateData struct {
+	Languages string
+}
+
 func generateTypeScript(
+	languages Languages,
+) (string, error) {
+	languagesCode, generateError := generateTypeScriptLanguages(languages)
+
+	if generateError != nil {
+		return "", generateError
+	}
+
+	parsedTemplate, parseError := template.New("typescript").
+		Parse(typeScriptTemplate)
+
+	if parseError != nil {
+		return "", parseError
+	}
+
+	var output bytes.Buffer
+
+	executeError := parsedTemplate.Execute(
+		&output,
+		TypeScriptTemplateData{
+			Languages: languagesCode,
+		},
+	)
+
+	if executeError != nil {
+		return "", executeError
+	}
+
+	return output.String(), nil
+}
+
+func generateTypeScriptLanguages(
 	languages Languages,
 ) (string, error) {
 	var output strings.Builder
 
 	languageNames := sortedLanguageNames(languages)
 
-	output.WriteString(
-		"export const languages = {\n",
-	)
+	output.WriteString("{\n")
 
 	for _, languageName := range languageNames {
 		output.WriteString("  ")
@@ -40,9 +80,7 @@ func generateTypeScript(
 		output.WriteString(",\n")
 	}
 
-	output.WriteString(
-		"} as const\n",
-	)
+	output.WriteString("}")
 
 	return output.String(), nil
 }
