@@ -1,9 +1,9 @@
-package main
+package localization
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+
+	"github.com/dinmukhamednurkaliyev/toolbox/foundation"
 )
 
 type Entries map[string]Entry
@@ -16,29 +16,10 @@ type Entry struct {
 func readEntries(
 	filePath string,
 ) (Entries, error) {
-	fileContent, readError := os.ReadFile(filePath)
+	content, readError := foundation.ReadJSON(filePath)
 
 	if readError != nil {
-		return nil, fmt.Errorf(
-			"read file %q: %w",
-			filePath,
-			readError,
-		)
-	}
-
-	var content map[string]any
-
-	parseError := json.Unmarshal(
-		fileContent,
-		&content,
-	)
-
-	if parseError != nil {
-		return nil, fmt.Errorf(
-			"parse localization file %q: %w",
-			filePath,
-			parseError,
-		)
+		return nil, readError
 	}
 
 	return createEntries(content)
