@@ -2,16 +2,16 @@ package command
 
 import "fmt"
 
-func runGenerate(
+func runValidate(
 	arguments []string,
 ) error {
 	if len(arguments) == 0 {
-		printGenerateHelp()
+		printValidateHelp()
 		return nil
 	}
 
 	if isHelpArgument(arguments[0]) {
-		printGenerateHelp()
+		printValidateHelp()
 		return nil
 	}
 
@@ -20,13 +20,13 @@ func runGenerate(
 
 	switch subject {
 	case "localization":
-		return runGenerateLocalization(
+		return runValidateLocalization(
 			commandArguments,
 		)
 
 	default:
 		return fmt.Errorf(
-			"unsupported generate subject %q\n\nUse \"toolbox generate --help\" to see available subjects",
+			"unsupported validate subject %q\n\nUse \"toolbox validate --help\" to see available subjects",
 			subject,
 		)
 	}
