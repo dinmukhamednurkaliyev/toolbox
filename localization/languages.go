@@ -2,8 +2,9 @@ package localization
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
+
+	"github.com/dinmukhamednurkaliyev/toolbox/foundation"
 )
 
 type Languages map[string]Entries
@@ -11,14 +12,12 @@ type Languages map[string]Entries
 func readLanguages(
 	directoryPath string,
 ) (Languages, error) {
-	directoryEntries, readError := os.ReadDir(directoryPath)
+	directoryEntries, readError := foundation.ReadDirectory(
+		directoryPath,
+	)
 
 	if readError != nil {
-		return nil, fmt.Errorf(
-			"read languages directory %q: %w",
-			directoryPath,
-			readError,
-		)
+		return nil, readError
 	}
 
 	languages := make(Languages)
