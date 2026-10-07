@@ -3,6 +3,7 @@ package foundation
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 func ReadFile(
@@ -19,4 +20,36 @@ func ReadFile(
 	}
 
 	return fileContent, nil
+}
+
+func WriteFile(
+	filePath string,
+	content []byte,
+) error {
+	directoryPath := filepath.Dir(filePath)
+
+	if createDirectoryError := os.MkdirAll(
+		directoryPath,
+		0o755,
+	); createDirectoryError != nil {
+		return fmt.Errorf(
+			"create directory %q: %w",
+			directoryPath,
+			createDirectoryError,
+		)
+	}
+
+	if writeError := os.WriteFile(
+		filePath,
+		content,
+		0o644,
+	); writeError != nil {
+		return fmt.Errorf(
+			"write file %q: %w",
+			filePath,
+			writeError,
+		)
+	}
+
+	return nil
 }
