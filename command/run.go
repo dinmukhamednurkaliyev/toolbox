@@ -1,8 +1,6 @@
 package command
 
-import (
-	"io"
-)
+import "io"
 
 func Run(program Program, arguments []string, output io.Writer) error {
 	if len(arguments) == 0 {
@@ -15,5 +13,5 @@ func Run(program Program, arguments []string, output io.Writer) error {
 		}
 	}
 
-	return runAction(arguments, output)
+	return RunAction(program, arguments, output)
 }

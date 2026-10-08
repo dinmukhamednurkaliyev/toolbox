@@ -1,8 +1,10 @@
 package configuration
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/dinmukhamednurkaliyev/toolbox/foundation"
 )
@@ -35,20 +37,41 @@ func LoadIfExists() (Definition, bool, error) {
 }
 
 func parseDefinition(content []byte) (Definition, error) {
+	decoder := json.NewDecoder(bytes.NewReader(content))
+	decoder.DisallowUnknownFields()
+
 	var definition Definition
 
-	if parseError := json.Unmarshal(content, &definition); parseError != nil {
+	if decodeError := decoder.Decode(&definition); decodeError != nil {
 		return Definition{}, fmt.Errorf(
 			"parse configuration %q: %w",
 			FileName,
-			parseError,
+			decodeError,
 		)
 	}
 
-	if definition.Actions == nil {
+	var additionalContent json.RawMessage
+
+	if decodeError := decoder.Decode(&additionalContent); decodeError != io.EOF {
+		if decodeError != nil {
+			return Definition{}, fmt.Errorf(
+				"parse configuration %q: %w",
+				FileName,
+				decodeError,
+			)
+		}
+
 		return Definition{}, fmt.Errorf(
-			"configuration %q must contain an actions object",
+			"configuration %q must contain only one JSON object",
 			FileName,
+		)
+	}
+
+	if validationError := Validate(definition); validationError != nil {
+		return Definition{}, fmt.Errorf(
+			"validate configuration %q: %w",
+			FileName,
+			validationError,
 		)
 	}
 

@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/dinmukhamednurkaliyev/toolbox/configuration"
 	"github.com/dinmukhamednurkaliyev/toolbox/foundation"
 )
 
-func runAction(arguments []string, output io.Writer) error {
-	projectConfiguration, exists, loadError := configuration.LoadIfExists()
+func RunAction(program Program, arguments []string, output io.Writer) error {
+	projectConfiguration, exists, loadError := loadProjectConfiguration(program)
 	if loadError != nil {
 		return loadError
 	}
@@ -26,15 +25,11 @@ func runAction(arguments []string, output io.Writer) error {
 	}
 
 	if len(arguments) == 1 {
-		if actionDefinition.Run == "" {
-			if len(actionDefinition.Targets) > 0 {
-				return fmt.Errorf("action %q requires a target", actionName)
-			}
-
-			return fmt.Errorf("action %q has no run command", actionName)
+		if actionDefinition.Run != "" {
+			return foundation.ExecuteProcess(actionDefinition.Run, output)
 		}
 
-		return foundation.ExecuteProcess(actionDefinition.Run, output)
+		return fmt.Errorf("action %q requires a target", actionName)
 	}
 
 	if len(arguments) > 2 {
@@ -51,14 +46,6 @@ func runAction(arguments []string, output io.Writer) error {
 	if !targetExists {
 		return fmt.Errorf(
 			"unknown target %q for action %q",
-			targetName,
-			actionName,
-		)
-	}
-
-	if targetDefinition.Run == "" {
-		return fmt.Errorf(
-			"target %q of action %q has no run command",
 			targetName,
 			actionName,
 		)
