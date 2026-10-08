@@ -8,14 +8,12 @@ import (
 )
 
 func main() {
-	if runError := command.Run(
+	if executionError := command.Run(
+		Toolbox,
 		os.Args[1:],
-	); runError != nil {
-		fmt.Fprintln(
-			os.Stderr,
-			runError,
-		)
-
+		os.Stdout,
+	); executionError != nil {
+		_, _ = fmt.Fprintln(os.Stderr, executionError)
 		os.Exit(1)
 	}
 }

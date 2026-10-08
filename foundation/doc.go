@@ -1,2 +1,2 @@
-// Package foundation provides shared building blocks used across Toolbox.
+// Package foundation provides reusable operating system operations.
 package foundation

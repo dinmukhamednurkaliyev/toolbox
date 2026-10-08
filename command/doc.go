@@ -1,2 +1,2 @@
-// Package command provides command parsing and execution for Toolbox.
+// Package command defines, registers, and runs Toolbox commands and presents command help.
 package command

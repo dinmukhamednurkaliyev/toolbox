@@ -1,39 +1,20 @@
 package command
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
-// Run parses and executes a Toolbox command.
-func Run(
-	arguments []string,
-) error {
+func Run(program Program, arguments []string, output io.Writer) error {
 	if len(arguments) == 0 {
-		printRootHelp()
-		return nil
+		return printHelp(program, output)
 	}
 
-	if isHelpArgument(arguments[0]) {
-		printRootHelp()
-		return nil
+	for _, registeredCommand := range registeredCommands(program) {
+		if arguments[0] == registeredCommand.definition.Name {
+			return registeredCommand.execute(arguments[1:], output)
+		}
 	}
 
-	verb := arguments[0]
-	commandArguments := arguments[1:]
-
-	switch verb {
-	case "generate":
-		return runGenerate(
-			commandArguments,
-		)
-
-	case "validate":
-		return runValidate(
-			commandArguments,
-		)
-
-	default:
-		return fmt.Errorf(
-			"unsupported command %q\n\nUse \"toolbox --help\" to see available commands",
-			verb,
-		)
-	}
+	return fmt.Errorf("unknown command %q", arguments[0])
 }

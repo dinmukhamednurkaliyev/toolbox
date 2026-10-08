@@ -1,106 +1,43 @@
 package command
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"strings"
+)
 
-const generateLocalizationUsage = "toolbox generate localization --source <directory> --target <target> --output <file>"
-
-const validateLocalizationUsage = "toolbox validate localization --source <directory>"
-
-func printRootHelp() {
-	fmt.Print(`Toolbox
-
-Usage:
-  toolbox <verb> <subject> [options]
-
-Commands:
-  generate localization   Generate localization source code
-  validate localization   Validate localization source files
-
-Use "toolbox <verb> --help" for more information.
-`)
+var Help = Definition{
+	Name:        "help",
+	Description: "Show available commands",
 }
 
-func printGenerateHelp() {
-	fmt.Print(`Generate
+func runHelp(program Program, arguments []string, output io.Writer) error {
+	if len(arguments) > 0 {
+		return fmt.Errorf(
+			"command %q does not accept arguments",
+			Help.Name,
+		)
+	}
 
-Usage:
-  toolbox generate <subject> [options]
-
-Subjects:
-  localization   Generate localization source code
-
-Use "toolbox generate <subject> --help" for more information.
-`)
+	return printHelp(program, output)
 }
 
-func printGenerateLocalizationHelp() {
-	fmt.Printf(`Generate localization source code.
+func printHelp(program Program, output io.Writer) error {
+	var helpContent strings.Builder
+	fmt.Fprintf(&helpContent, "%s\n%s\n\nUsage:\n  %s <action> [target]\n\nCommands:\n",
+		program.Name,
+		program.Description,
+		program.Name)
 
-Usage:
-  %s
+	for _, registeredCommand := range registeredCommands(program) {
+		fmt.Fprintf(&helpContent, "  %-12s %s\n",
+			registeredCommand.definition.Name,
+			registeredCommand.definition.Description)
+	}
 
-Options:
-  --source <directory>   Localization source directory
-  --target <target>      Generation target: dart or typescript
-  --output <file>        Generated output file
-`, generateLocalizationUsage)
-}
+	if _, writeError := io.WriteString(output, helpContent.String()); writeError != nil {
+		return fmt.Errorf("write help: %w", writeError)
+	}
 
-func printValidateHelp() {
-	fmt.Print(`Validate
-
-Usage:
-  toolbox validate <subject> [options]
-
-Subjects:
-  localization   Validate localization source files
-
-Use "toolbox validate <subject> --help" for more information.
-`)
-}
-
-func printValidateLocalizationHelp() {
-	fmt.Printf(`Validate localization source files.
-
-Usage:
-  %s
-
-Options:
-  --source <directory>   Localization source directory
-`, validateLocalizationUsage)
-}
-
-func generateLocalizationUsageError(
-	message string,
-) error {
-	return fmt.Errorf(
-		"%s\n\nUsage:\n  %s\n\nUse \"toolbox generate localization --help\" for more information.",
-		message,
-		generateLocalizationUsage,
-	)
-}
-
-func validateLocalizationUsageError(
-	message string,
-) error {
-	return fmt.Errorf(
-		"%s\n\nUsage:\n  %s\n\nUse \"toolbox validate localization --help\" for more information.",
-		message,
-		validateLocalizationUsage,
-	)
-}
-
-func isHelpArgument(
-	argument string,
-) bool {
-	return argument == "help" ||
-		argument == "--help" ||
-		argument == "-h"
-}
-
-func isHelpOption(
-	argument string,
-) bool {
-	return argument == "--help" ||
-		argument == "-h"
+	return nil
 }
