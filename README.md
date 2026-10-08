@@ -1,7 +1,7 @@
 <p align="center">
   <img
     src="documentation/toolbox-banner.png"
-    alt="Qadam"
+    alt="Toolbox"
     width="100%"
   />
 </p>

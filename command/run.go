@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"io"
 )
 
@@ -16,5 +15,5 @@ func Run(program Program, arguments []string, output io.Writer) error {
 		}
 	}
 
-	return fmt.Errorf("unknown command %q", arguments[0])
+	return runAction(arguments, output)
 }

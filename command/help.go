@@ -3,7 +3,10 @@ package command
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
+
+	"github.com/dinmukhamednurkaliyev/toolbox/configuration"
 )
 
 var Help = Definition{
@@ -30,9 +33,54 @@ func printHelp(program Program, output io.Writer) error {
 		program.Name)
 
 	for _, registeredCommand := range registeredCommands(program) {
-		fmt.Fprintf(&helpContent, "  %-12s %s\n",
+		fmt.Fprintf(&helpContent, "  %-24s %s\n",
 			registeredCommand.definition.Name,
 			registeredCommand.definition.Description)
+	}
+
+	projectConfiguration, exists, loadError := configuration.LoadIfExists()
+	if loadError != nil {
+		return loadError
+	}
+
+	if exists && len(projectConfiguration.Actions) > 0 {
+		helpContent.WriteString("\nProject actions:\n")
+
+		actionNames := make([]string, 0, len(projectConfiguration.Actions))
+
+		for actionName := range projectConfiguration.Actions {
+			actionNames = append(actionNames, actionName)
+		}
+
+		sort.Strings(actionNames)
+
+		for _, actionName := range actionNames {
+			action := projectConfiguration.Actions[actionName]
+
+			if len(action.Targets) == 0 {
+				fmt.Fprintf(&helpContent, "  %-24s %s\n",
+					actionName,
+					action.Description)
+
+				continue
+			}
+
+			targetNames := make([]string, 0, len(action.Targets))
+
+			for targetName := range action.Targets {
+				targetNames = append(targetNames, targetName)
+			}
+
+			sort.Strings(targetNames)
+
+			for _, targetName := range targetNames {
+				target := action.Targets[targetName]
+
+				fmt.Fprintf(&helpContent, "  %-24s %s\n",
+					actionName+" "+targetName,
+					target.Description)
+			}
+		}
 	}
 
 	if _, writeError := io.WriteString(output, helpContent.String()); writeError != nil {

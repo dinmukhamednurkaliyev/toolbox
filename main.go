@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/dinmukhamednurkaliyev/toolbox/command"
+	"github.com/dinmukhamednurkaliyev/toolbox/foundation"
 )
 
 func main() {
@@ -14,6 +15,6 @@ func main() {
 		os.Stdout,
 	); executionError != nil {
 		_, _ = fmt.Fprintln(os.Stderr, executionError)
-		os.Exit(1)
+		os.Exit(foundation.ProcessExitCode(executionError))
 	}
 }
